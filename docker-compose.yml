@@ -1,0 +1,24 @@
+services:
+  db1:
+    build: ./mysql
+    volumes:
+      - ./mysql/my1.cnf:/etc/mysql/my.cnf
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+
+  db2:
+    build: ./mysql
+    volumes:
+      - ./mysql/my2.cnf:/etc/mysql/my.cnf
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+
+  db3:
+    build: ./mysql
+    volumes:
+      - ./mysql/my3.cnf:/etc/mysql/my.cnf
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
