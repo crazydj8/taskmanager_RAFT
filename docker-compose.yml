@@ -6,6 +6,8 @@ services:
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     environment:
       MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - 33061:3306
 
   db2:
     build: ./mysql
@@ -14,6 +16,8 @@ services:
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     environment:
       MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - 33062:3306
 
   db3:
     build: ./mysql
@@ -22,3 +26,5 @@ services:
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     environment:
       MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - 33063:3306
