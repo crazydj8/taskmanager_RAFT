@@ -1,0 +1,10 @@
+setuptools
+cryptography==3.3
+msgpack-python==0.4.8
+flask
+mysql-connector-python==8.0.17
+streamlit
+pandas
+pymysql
+sqlalchemy
+aiohttp
