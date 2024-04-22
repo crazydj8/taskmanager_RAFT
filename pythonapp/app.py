@@ -28,15 +28,22 @@ def main():
     elif operation == 'Insert':
         task = st.text_input("Task")
         assigned_to = st.text_input("Assigned To")
-        priority = st.text_input("Priority")
-        status = st.text_input("Status")
+        priority = st.selectbox('Priority:', ['Low', 'Medium', 'High'])
+        status = "To Do"
+        st.text("Status:")
+        st.text(status)
         if st.button("Create Task"):
             forward_to_flask(f'http://localhost:5000/create_task', {'task': task, 'assigned_to': assigned_to, 'priority': priority, 'status': status})
 
     elif operation == 'Update':
         task_id = st.text_input("Task ID")
-        field = st.selectbox("Select field to update", ['task', 'assigned_to', 'status', 'priority'])
-        new_value = st.text_input(f"New value for {field}")
+        field = st.selectbox("Select field to update", ['task', 'assigned_to', 'priority', 'status'])
+        if field in ['task', 'assigned_to']:
+            new_value = st.text_input(f"New value for {field}")
+        elif field == 'priority':
+            new_value = st.selectbox("New value for priority", ['High', 'Medium', 'Low'])  # Replace with your actual priority options
+        elif field == 'status':
+            new_value = st.selectbox("New value for status", ['To Do', 'In Progress', 'Done'])  # Replace with your actual status options
         if st.button("Update Task"):
             forward_to_flask(f'http://localhost:5000/update_task', {'task_id': task_id, 'field': field, 'new_value': new_value})
 
