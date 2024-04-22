@@ -20,6 +20,7 @@ HTTPPORT = PORT + 10
 NODE_LOGFILE = f'node{NODE_ID}_CUSTOMLOG.log'
 # Since this is run for each 'node', we're telling this node
 # what ports the other nodes are running on.
+other_node_ids = [id for id in [1,2,3] if id != NODE_ID]
 other_nodes_ports = [p for p in [8000, 8001, 8002] if p != PORT]
 
 raftos.configure({
@@ -54,10 +55,22 @@ def connect_to_database(node_id):
 
     return connection
 
-# conn = connect_to_database(NODE_ID)
-# cur = conn.cursor()
-# cur.execute("INSERT INTO tasks (task, assigned_to, priority, status) VALUES ('Test','Arya', 'High', 'To Do');")
-# conn.commit()
+## updation logic
+def updatedb(id, data, operation):
+    connection = connect_to_database(id)
+    cursor = connection.cursor()
+    
+    if operation == 'write':
+        cursor.execute("INSERT INTO tasks (task, assigned_to, priority, status) VALUES (%s, %s, %s, %s)", (data["task"], data["assigned_to"], data["priority"], data["status"]))
+    
+    elif operation == 'update':
+        cursor.execute(f"UPDATE tasks SET {data['field']} = %s WHERE task_id = %s", (data['new_value'], data['task_id']))
+        
+    elif operation == 'delete':
+        cursor.execute("DELETE FROM tasks WHERE task_id = %s", (data['task_id'],))
+    
+    connection.commit()
+    connection.close()
 
 with open(NODE_LOGFILE, 'w') as log_file:
     pass
@@ -96,19 +109,15 @@ async def handle_mysql_request(request):
     # Extract operation details from the request
     request_data = await request.json()
     operation = request_data.get('operation')
-    data = request_data.get('data')
-    print(request_data)
-    '''# Perform the operation on the leader node
+    # Perform the operation on the leader node
     if raftos.get_leader() == this_node_address:
-        if operation == 'write':
-            # Connect to MySQL and perform the write operation
-            connection = connect_to_database(NODE_ID)
-            cursor = connection.cursor()
-            cursor.execute("UPDATE tasks SET task = %s WHERE task = %s", (data['new_task'], data['old_task']))
-            connection.commit()
-            connection.close()'''
+        
+        updatedb(NODE_ID, request_data, operation)
 
-        # Add more operations as needed...
+        # Replication logic:
+        
+        for i in other_node_ids:
+            updatedb(i, request_data, operation)
 
     return web.Response(text='Operation completed')
 
